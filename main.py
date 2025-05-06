@@ -15,7 +15,7 @@ import os
 
 from utils.sampling import mnist_iid, mnist_noniid, cifar_iid,cifar_noniid
 from utils.options import args_parser
-from models.Update import LocalUpdateDP, LocalUpdateDPSerial
+from models.Update import LocalUpdateDP, LocalUpdateDPSerial, LocalUpdateDP_Grad
 from models.Nets import MLP, CNNMnist, CNNCifar, CNNFemnist, CharLSTM
 from models.Fed import FedAvg, FedWeightAvg
 from models.test import test_img
@@ -133,7 +133,7 @@ if __name__ == '__main__':
     if args.serial:
         clients = [LocalUpdateDPSerial(args=args, dataset=dataset_train, idxs=dict_users[i]) for i in range(args.num_users)]
     else:
-        clients = [LocalUpdateDP(args=args, dataset=dataset_train, idxs=dict_users[i]) for i in range(args.num_users)]
+        clients = [LocalUpdateDP_Grad(args=args, dataset=dataset_train, idxs=dict_users[i]) for i in range(args.num_users)]
     m, loop_index = max(int(args.frac * args.num_users), 1), int(1 / args.frac)
     for iter in range(args.epochs):
         t_start = time.time()
@@ -158,7 +158,7 @@ if __name__ == '__main__':
         net_glob.eval()
         acc_t, loss_t = test_img(net_glob, dataset_test, args)
         t_end = time.time()
-        print("Round {:3d},Testing accuracy: {:.2f},Time:  {:.2f}s".format(iter, acc_t, t_end - t_start))
+        print("Round {:3d},  Testing accuracy: {:.2f},  Time: {:.2f}s".format(iter, acc_t, t_end - t_start))
 
         acc_test.append(acc_t.item())
 
